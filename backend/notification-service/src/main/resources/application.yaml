@@ -1,0 +1,23 @@
+server:
+  port: 8082
+
+spring:
+  data:
+    mongodb:
+      uri: mongodb://${MongoDB_USERNAME}:${MongoDB_PASSWORD}@${MongoDB_CLUSTER_HOST}:${MongoDB_CLUSTER_PORT}/${MongoDB_DATABASE}?retryWrites=true&w=majority
+  application:
+    name: notification-service
+
+amqp:
+  notif:
+    queue: notification-queue
+    exchange: notification-exchange
+    routingkey: 'notification.#.*'
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka
+    register-with-eureka: true
+    fetch-registry: true
+
