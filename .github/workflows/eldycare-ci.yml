@@ -58,19 +58,15 @@ jobs:
     name: push-to-dockerhub-rabbitmq
     runs-on: ubuntu-latest
     steps:
-      - name: Download Artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: rabbitmq
-      - name: List contents of the folders
-        run: ls -R
       - name: Log in to Docker Hub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
       - name: Build & push RabbitMQ Docker image
         run: |
              docker-compose -f backend/docker-compose.yml build rabbitmq
              docker-compose -f backend/docker-compose.yml push rabbitmq
-        
+
+          
   deploy-to-eks:
     name: Deploy to Amazon EKS
     runs-on: ubuntu-latest
