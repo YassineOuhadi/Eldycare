@@ -63,8 +63,8 @@ jobs:
 
       - name: Build & push RabbitMQ Docker image
         run: |
-             docker-compose -f backend/docker-compose.yml build rabbitmq
-             docker-compose -f backend/docker-compose.yml push rabbitmq
+             docker-compose -f docker-compose.yml build rabbitmq
+             docker-compose -f docker-compose.yml push rabbitmq
           
   deploy-to-eks:
     name: Deploy to Amazon EKS
