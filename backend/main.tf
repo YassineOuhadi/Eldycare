@@ -8,5 +8,7 @@ module "eks" {
   cluster_version = "1.21"
   vpc_id          = "vpc-04e1603798ea0e88d"
 
+  count = var.create_cluster ? 1 : 0
+
   subnet_ids = ["subnet-0af154e1ea5025a6b", "subnet-0cc88ba02fb8a36a7", "subnet-0374d3ab0d4715e9e", "subnet-0e04f8052bf1e758a"]
 }
