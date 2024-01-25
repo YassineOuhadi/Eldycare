@@ -9,13 +9,6 @@ on:
     branches: ["main"]
     paths: "backend/**"
 
-# on:
-#   push:
-#     branches:
-#       - main
-#     paths: 
-#       - backend/**
-
 jobs:
   build-microservices:
     name: build-microservices
@@ -76,12 +69,18 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: "us-east-1"
 
-      - name: Deploy EKS Resources
+      - name: Check if EKS cluster exists
         run: |
-          cd backend
-          terraform init
-          terraform apply -auto-approve
-      
+          eks_cluster_name="eldycare-cluster"
+          if aws eks describe-cluster --region us-east-1 --name $eks_cluster_name 2>/dev/null; then
+            echo "EKS cluster $eks_cluster_name already exists."
+          else
+            echo "EKS cluster $eks_cluster_name does not exist. Creating..."
+            cd backend
+            terraform init
+            terraform apply -auto-approve
+          fi
+
       - name: Configure kubectl for EKS
         run: |
           aws eks --region us-east-1 update-kubeconfig --name eldycare-cluster
