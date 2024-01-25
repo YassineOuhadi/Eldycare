@@ -53,6 +53,19 @@ jobs:
           registry: docker.io
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
+
+  push-to-dockerhub-rabbitmq:
+    name: push-to-dockerhub-rabbitmq
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build & push Docker image rabbitmq
+        uses: mr-smithers-excellent/docker-build-push@v6
+        with:
+          image: yassineouhadi/eldycare-rabbitmq
+          tags: latest
+          registry: docker.io
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
           
   deploy-to-eks:
     name: Deploy to Amazon EKS
@@ -87,5 +100,10 @@ jobs:
 
       - name: Deploy Services to EKS
         run: |
-          kubectl apply -f backend/discovery-service/discovery-service-deployment.yaml
-          kubectl apply -f backend/discovery-service/discovery-service-service.yaml
+          cd backend
+
+          kubectl apply -f discovery-service/discovery-service-deployment.yaml
+          kubectl apply -f discovery-service/discovery-service-service.yaml
+
+          kubectl apply -f rabbitmq/rabbitmq-deployment.yaml
+          kubectl apply -f rabbitmq/rabbitmq-service.yaml
