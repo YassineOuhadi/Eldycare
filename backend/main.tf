@@ -8,4 +8,5 @@ module "eks" {
   cluster_version = "1.21"
 
   vpc_id       = "vpc-04e1603798ea0e88d"
+  subnet_ids = module.vpc.private_subnets
 }
