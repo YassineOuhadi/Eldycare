@@ -53,19 +53,6 @@ jobs:
           registry: docker.io
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-
-  push-to-dockerhub-rabbitmq:
-    name: push-to-dockerhub-rabbitmq
-    runs-on: ubuntu-latest
-    steps:
-      - name: Log in to Docker Hub
-        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-
-      - name: Build & push RabbitMQ Docker image
-        run: |
-             docker-compose -f backend/docker-compose.yml build rabbitmq
-             docker tag backend_rabbitmq:latest yassineouhadi/eldycare-rabbitmq:latest
-             docker push yassineouhadi/eldycare-rabbitmq:latest
           
   deploy-to-eks:
     name: Deploy to Amazon EKS
@@ -105,5 +92,5 @@ jobs:
           kubectl apply -f discovery-service/discovery-service-deployment.yaml
           kubectl apply -f discovery-service/discovery-service-service.yaml
 
-          kubectl apply -f rabbitmq/rabbitmq-deployment.yaml
-          kubectl apply -f rabbitmq/rabbitmq-service.yaml
+          kubectl apply -f api-gateway-service/api-gateway-service-deployment.yaml
+          kubectl apply -f api-gateway-service/api-gateway-service-service.yaml
