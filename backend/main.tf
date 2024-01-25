@@ -9,7 +9,3 @@ module "eks" {
 
   vpc_id       = "vpc-04e1603798ea0e88d"
 }
-
-output "kubeconfig" {
-  value = module.eks.kubeconfig
-}
