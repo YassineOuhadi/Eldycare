@@ -1,0 +1,35 @@
+{
+    "PolicyGroups": [],
+    "PolicyUsers": [
+        {
+            "UserName": "yassine",
+            "UserId": "AIDA2FFRIWPI3YN7XAT4J"
+        }
+    ],
+    "PolicyRoles": [
+        {
+            "RoleName": "eldycare-cluster-cluster-20240125143824332700000001",
+            "RoleId": "AROA2FFRIWPI34W7GODBD"
+        },
+        {
+            "RoleName": "eldycare-cluster-cluster-20240125160912215800000003",
+            "RoleId": "AROA2FFRIWPIQG76XN6KP"
+        },
+        {
+            "RoleName": "eldycare-cluster-role",
+            "RoleId": "AROA2FFRIWPIS4DYNMOT4"
+        },
+        {
+            "RoleName": "eldycare-cluster-cluster-20240125162454951200000002",
+            "RoleId": "AROA2FFRIWPIUFT2FGJGZ"
+        },
+        {
+            "RoleName": "eldycare-cluster-cluster-20240125161626422100000002",
+            "RoleId": "AROA2FFRIWPIV2W4ECHQ6"
+        },
+        {
+            "RoleName": "eksctl-eldycare-cluster-cluster-ServiceRole-hA8s1DQpcU13",
+            "RoleId": "AROA2FFRIWPIZG7GPJVQQ"
+        }
+    ]
+}
