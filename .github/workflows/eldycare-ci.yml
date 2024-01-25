@@ -63,6 +63,7 @@ jobs:
 
       - name: Build & push RabbitMQ Docker image
         run: |
+             ls
              cd backend
              docker-compose -f docker-compose.yml build rabbitmq
              docker-compose -f docker-compose.yml push rabbitmq
