@@ -78,7 +78,8 @@ jobs:
 
       - name: Deploy EKS Resources
         run: |
-          terraform init backend
+          cd backend
+          terraform init
           terraform apply -auto-approve
       
       - name: Configure kubectl for EKS
