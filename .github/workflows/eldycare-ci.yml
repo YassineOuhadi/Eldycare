@@ -116,7 +116,7 @@ jobs:
           cd backend
 
           kubectl apply -f discovery-service/discovery-service-deployment.yaml
-          kubectl apply -f discovery-service/discovery-service-service.yaml
+          kubectl apply -f discovery-service/discovery-service.yaml
 
           kubectl apply -f api-gateway-service/api-gateway-service-deployment.yaml
-          kubectl apply -f api-gateway-service/api-gateway-service-service.yaml
+          kubectl apply -f api-gateway-service/api-gateway-service.yaml
