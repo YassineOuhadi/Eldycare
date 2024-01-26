@@ -121,5 +121,14 @@ jobs:
           kubectl apply -f api-gateway-service/api-gateway-service-deployment.yaml
           kubectl apply -f api-gateway-service/api-gateway-service.yaml
 
+          kubectl apply -f mongodb-notification/mongodb-notification-deployment.yaml
+          kubectl apply -f mongodb-notification/mongodb-notification-service.yaml
+
+          kubectl apply -f mongodb-reminder/mongodb-reminder-deployment.yaml
+          kubectl apply -f mongodb-reminder/mongodb-reminder-service.yaml
+
+          kubectl apply -f neo4j/neo4j-deployment.yaml
+          kubectl apply -f neo4j/neo4j-service.yaml
+
           kubectl apply -f rabbitmq/rabbitmq-deployment.yaml
           kubectl apply -f rabbitmq/rabbitmq-service.yaml
