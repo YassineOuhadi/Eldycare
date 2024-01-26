@@ -6,14 +6,14 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: postgres
+      app: postgres-service
   template:
     metadata:
       labels:
-        app: postgres
+        app: postgres-service
     spec:
       containers:
-        - name: postgres
+        - name: postgres-service
           image: postgres:latest
           ports:
             - containerPort: 5432
