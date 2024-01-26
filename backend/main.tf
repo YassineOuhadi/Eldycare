@@ -5,8 +5,8 @@ provider "aws" {
 module "eks" {
   source          = "terraform-aws-modules/eks/aws"
   cluster_name    = "eldycare-cluster"
-  cluster_version = "1.28"
-  vpc_id          = "vpc-04e1603798ea0e88d"
+  cluster_version = "1.29"
+  vpc_id          = "vpc-08804cac612ac531b"
 
-  subnet_ids = ["subnet-0af154e1ea5025a6b", "subnet-0cc88ba02fb8a36a7", "subnet-0374d3ab0d4715e9e", "subnet-0e04f8052bf1e758a"]
+  subnet_ids = ["subnet-09a57effd1d28e4b7", "subnet-0a679748a9ea1211b", "subnet-0a4193b9da2258c67", "subnet-0fef17bad484371a2"]
 }
