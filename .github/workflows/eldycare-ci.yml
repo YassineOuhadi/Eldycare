@@ -187,7 +187,7 @@ jobs:
   deploy-authentication-service:
     name: Deploy Authentication Service to EKS
     runs-on: ubuntu-latest
-    needs: [create-eks-cluster, push-to-dockerhub-authentication-service]
+    needs: [create-eks-cluster, push-to-dockerhub-authentication-service, deploy-postgres-service, deploy-rabbitmq-service]
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
@@ -237,6 +237,32 @@ jobs:
 
           kubectl apply -f mongodb-notification-deployment.yaml
           kubectl apply -f mongodb-notification-service.yaml
+
+  deploy-postgres-service:
+    name: Deploy Postgres Service to EKS
+    runs-on: ubuntu-latest
+    needs: [create-eks-cluster]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Set up AWS CLI
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: "us-east-1"
+
+      - name: Configure kubectl for EKS
+        run: |
+          aws eks --region us-east-1 update-kubeconfig --name eldycare-cluster
+
+      - name: Deploy Postgres Service to EKS
+        run: |
+          cd backend/postgres
+
+          kubectl apply -f postgres-deployment.yaml
+          kubectl apply -f postgres-service.yaml
 
   deploy-mongodb-reminder-service:
     name: Deploy MongoDB Reminder Service to EKS
