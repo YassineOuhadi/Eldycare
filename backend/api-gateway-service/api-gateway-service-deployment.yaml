@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: api-gateway-service
-        image: yassineouhadi/api-gateway-service:latest
+        image: yassineouhadi/eldycare-api-gateway-service:latest
         ports:
         - containerPort: 8888
         env:

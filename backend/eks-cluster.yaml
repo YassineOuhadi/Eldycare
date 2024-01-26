@@ -7,7 +7,7 @@ metadata:
 
 nodeGroups:
   - name: eks-nodes
-    desiredCapacity: 2
+    desiredCapacity: 3
     instancesDistribution:
       maxPrice: 0.066
       instanceTypes: ["t2.micro", "t3.micro"]
