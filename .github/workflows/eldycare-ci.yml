@@ -46,7 +46,7 @@ jobs:
     needs: build-microservices
     steps:
       - name: Download Artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v3
         with:
           name: discovery-service
       - name: List contents of the folders
@@ -79,11 +79,10 @@ jobs:
           registry: docker.io
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-          
-  deploy-to-eks:
-    name: Deploy to Amazon EKS
+
+  create-eks-cluster:
+    name: Create EKS Cluster
     runs-on: ubuntu-latest
-    needs: push-to-dockerhub-discovery-service
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
@@ -102,33 +101,165 @@ jobs:
             echo "EKS cluster $eks_cluster_name already exists."
           else
             echo "EKS cluster $eks_cluster_name does not exist. Creating..."
-            cd backend
+            cd backend/terraform
             terraform init
             terraform apply -auto-approve
           fi
+
+  deploy-discovery-service:
+    name: Deploy Discovery Service to EKS
+    runs-on: ubuntu-latest
+    needs: [create-eks-cluster, push-to-dockerhub-discovery-service]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Set up AWS CLI
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: "us-east-1"
 
       - name: Configure kubectl for EKS
         run: |
           aws eks --region us-east-1 update-kubeconfig --name eldycare-cluster
 
-      - name: Deploy Services to EKS
+      - name: Deploy Discovery Service to EKS
         run: |
-          cd backend
+          cd backend/discovery-service
 
-          kubectl apply -f discovery-service/discovery-service-deployment.yaml
-          kubectl apply -f discovery-service/discovery-service.yaml
+          kubectl apply -f discovery-service-deployment.yaml
+          kubectl apply -f discovery-service.yaml
+    
+  deploy-api-gateway-service:
+    name: Deploy API Gateway Service to EKS
+    runs-on: ubuntu-latest
+    needs: [create-eks-cluster, push-to-dockerhub-api-gateway-service]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
 
-          kubectl apply -f api-gateway-service/api-gateway-service-deployment.yaml
-          kubectl apply -f api-gateway-service/api-gateway-service.yaml
+      - name: Set up AWS CLI
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: "us-east-1"
 
-          kubectl apply -f mongodb-notification/mongodb-notification-deployment.yaml
-          kubectl apply -f mongodb-notification/mongodb-notification-service.yaml
+      - name: Configure kubectl for EKS
+        run: |
+          aws eks --region us-east-1 update-kubeconfig --name eldycare-cluster
 
-          kubectl apply -f mongodb-reminder/mongodb-reminder-deployment.yaml
-          kubectl apply -f mongodb-reminder/mongodb-reminder-service.yaml
+      - name: Deploy API Gateway Service to EKS
+        run: |
+          cd backend/api-gateway-service
 
-          kubectl apply -f neo4j/neo4j-deployment.yaml
-          kubectl apply -f neo4j/neo4j-service.yaml
+          kubectl apply -f api-gateway-service-deployment.yaml
+          kubectl apply -f api-gateway-service.yaml
+  
+  # ...
 
-          kubectl apply -f rabbitmq/rabbitmq-deployment.yaml
-          kubectl apply -f rabbitmq/rabbitmq-service.yaml
+  deploy-mongodb-notification-service:
+    name: Deploy MongoDB Notification Service to EKS
+    runs-on: ubuntu-latest
+    needs: [create-eks-cluster]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Set up AWS CLI
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: "us-east-1"
+
+      - name: Configure kubectl for EKS
+        run: |
+          aws eks --region us-east-1 update-kubeconfig --name eldycare-cluster
+
+      - name: Deploy MongoDB Notification Service to EKS
+        run: |
+          cd backend/mongodb-notification
+
+          kubectl apply -f mongodb-notification-deployment.yaml
+          kubectl apply -f mongodb-notification-service.yaml
+
+  deploy-mongodb-reminder-service:
+    name: Deploy MongoDB Reminder Service to EKS
+    runs-on: ubuntu-latest
+    needs: [create-eks-cluster]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Set up AWS CLI
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: "us-east-1"
+
+      - name: Configure kubectl for EKS
+        run: |
+          aws eks --region us-east-1 update-kubeconfig --name eldycare-cluster
+
+      - name: Deploy MongoDB Reminder Service to EKS
+        run: |
+          cd backend/mongodb-reminder
+
+          kubectl apply -f mongodb-reminder-deployment.yaml
+          kubectl apply -f mongodb-reminder-service.yaml
+          
+  deploy-neo4j-service:
+    name: Deploy Neo4j Service to EKS
+    runs-on: ubuntu-latest
+    needs: [create-eks-cluster]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Set up AWS CLI
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: "us-east-1"
+
+      - name: Configure kubectl for EKS
+        run: |
+          aws eks --region us-east-1 update-kubeconfig --name eldycare-cluster
+
+      - name: Deploy Neo4j Service to EKS
+        run: |
+          cd backend/neo4j
+
+          kubectl apply -f neo4j-deployment.yaml
+          kubectl apply -f neo4j-service.yaml
+
+  deploy-rabbitmq-service:
+    name: Deploy RabbitMQ Service to EKS
+    runs-on: ubuntu-latest
+    needs: [create-eks-cluster]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Set up AWS CLI
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: "us-east-1"
+
+      - name: Configure kubectl for EKS
+        run: |
+          aws eks --region us-east-1 update-kubeconfig --name eldycare-cluster
+
+      - name: Deploy RabbitMQ Service to EKS
+        run: |
+          cd backend/rabbitmq
+
+          kubectl apply -f rabbitmq-deployment.yaml
+          kubectl apply -f rabbitmq-service.yaml
