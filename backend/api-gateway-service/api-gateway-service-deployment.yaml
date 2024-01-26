@@ -21,6 +21,6 @@ spec:
         - name: container_discovery
           value: "discovery-service"
         - name: RABBITMQ_HOST
-          value: "rabbitmq"
+          value: "rabbitmq-service"
         - name: RABBITMQ_PORT
           value: "5672"
