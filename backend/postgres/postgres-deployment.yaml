@@ -13,7 +13,7 @@ spec:
         app: postgres
     spec:
       containers:
-        - name: postgresql
+        - name: postgres
           image: postgres:latest
           ports:
             - containerPort: 5432
