@@ -120,3 +120,6 @@ jobs:
 
           kubectl apply -f api-gateway-service/api-gateway-service-deployment.yaml
           kubectl apply -f api-gateway-service/api-gateway-service.yaml
+
+          kubectl apply -f rabbitmq/rabbitmq-deployment.yaml
+          kubectl apply -f rabbitmq/rabbitmq-service.yaml

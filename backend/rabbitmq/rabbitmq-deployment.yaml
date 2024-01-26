@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: rabbitmq
-          image: yassineouhadi/eldycare-rabbitmq-service:latest
+          image: rabbitmq:3.12-management
           ports:
             - containerPort: 5672
             - containerPort: 15672
