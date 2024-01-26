@@ -79,6 +79,26 @@ jobs:
           registry: docker.io
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
+    
+  push-to-dockerhub-authentication-service:
+    name: push-to-dockerhub-authentication-service
+    runs-on: ubuntu-latest
+    needs: build-microservices
+    steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: authentication-service
+      - name: List contents of the folders
+        run: ls -R
+      - name: Build & push Docker image authentication-service
+        uses: mr-smithers-excellent/docker-build-push@v6
+        with:
+          image: yassineouhadi/eldycare-authentication-service
+          tags: latest
+          registry: docker.io
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
   create-eks-cluster:
     name: Create EKS Cluster
@@ -157,6 +177,32 @@ jobs:
 
           kubectl apply -f api-gateway-service-deployment.yaml
           kubectl apply -f api-gateway-service.yaml
+
+  deploy-authentication-service:
+    name: Deploy Authentication Service to EKS
+    runs-on: ubuntu-latest
+    needs: [create-eks-cluster, push-to-dockerhub-authentication-service]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Set up AWS CLI
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: "us-east-1"
+
+      - name: Configure kubectl for EKS
+        run: |
+          aws eks --region us-east-1 update-kubeconfig --name eldycare-cluster
+
+      - name: Deploy Authentication Service to EKS
+        run: |
+          cd backend/authentication-service
+
+          kubectl apply -f authentication-service-deployment.yaml
+          kubectl apply -f authentication-service.yaml
   
   # ...
 
