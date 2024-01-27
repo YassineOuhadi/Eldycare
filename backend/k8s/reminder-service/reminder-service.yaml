@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: discovery-service
+  name: reminder-service
 spec:
   selector:
-    app: discovery-service
+    app: reminder-service
   ports:
     - protocol: TCP
-      port: 8761
-      targetPort: 8761
+      port: 8083
+      targetPort: 8083
   type: LoadBalancer

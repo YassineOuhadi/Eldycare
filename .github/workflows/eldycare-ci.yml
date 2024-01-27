@@ -51,6 +51,18 @@ jobs:
         with:
           name: user-service
           path: ./backend/user-service
+
+      - name: upload Artifacts for notification-service
+        uses: actions/upload-artifact@v4.0.0
+        with:
+          name: notification-service
+          path: ./backend/notification-service
+
+      - name: upload Artifacts for reminder-service
+        uses: actions/upload-artifact@v4.0.0
+        with:
+          name: reminder-service
+          path: ./backend/reminder-service
           
   push-to-dockerhub-discovery-service:
     name: push-to-dockerhub-discovery-service
@@ -131,6 +143,46 @@ jobs:
           registry: docker.io
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
+  
+  push-to-dockerhub-notification-service:
+    name: push-to-dockerhub-notification-service
+    runs-on: ubuntu-latest
+    needs: build-microservices
+    steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: notification-service
+      - name: List contents of the folders
+        run: ls -R
+      - name: Build & push Docker image notification-service
+        uses: mr-smithers-excellent/docker-build-push@v6
+        with:
+          image: yassineouhadi/eldycare-notification-service
+          tags: latest
+          registry: docker.io
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+  push-to-dockerhub-reminder-service:
+    name: push-to-dockerhub-reminder-service
+    runs-on: ubuntu-latest
+    needs: build-microservices
+    steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: reminder-service
+      - name: List contents of the folders
+        run: ls -R
+      - name: Build & push Docker image reminder-service
+        uses: mr-smithers-excellent/docker-build-push@v6
+        with:
+          image: yassineouhadi/eldycare-reminder-service
+          tags: latest
+          registry: docker.io
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
   create-eks-cluster:
     name: Create EKS Cluster
@@ -179,7 +231,7 @@ jobs:
 
       - name: Deploy Discovery Service to EKS
         run: |
-          cd backend/discovery-service
+          cd backend/k8s/discovery-service
 
           kubectl apply -f discovery-service-deployment.yaml
           kubectl apply -f discovery-service.yaml
@@ -205,7 +257,7 @@ jobs:
 
       - name: Deploy API Gateway Service to EKS
         run: |
-          cd backend/api-gateway-service
+          cd backend/k8s/api-gateway-service
 
           kubectl apply -f api-gateway-service-deployment.yaml
           kubectl apply -f api-gateway-service.yaml
@@ -231,7 +283,7 @@ jobs:
 
       - name: Deploy Authentication Service to EKS
         run: |
-          cd backend/authentication-service
+          cd backend/k8s/authentication-service
 
           kubectl apply -f authentication-service-deployment.yaml
           kubectl apply -f authentication-service.yaml
@@ -257,12 +309,62 @@ jobs:
 
       - name: Deploy User Service to EKS
         run: |
-          cd backend/user-service
+          cd backend/k8s/user-service
 
           kubectl apply -f user-service-deployment.yaml
           kubectl apply -f user-service.yaml
-  
-  # ...
+
+  deploy-notification-service:
+    name: Deploy Notification Service to EKS
+    runs-on: ubuntu-latest
+    needs: [create-eks-cluster, push-to-dockerhub-notification-service, deploy-mongodb-notification-service, deploy-rabbitmq-service]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Set up AWS CLI
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: "us-east-1"
+
+      - name: Configure kubectl for EKS
+        run: |
+          aws eks --region us-east-1 update-kubeconfig --name eldycare-cluster
+
+      - name: Deploy Notification Service to EKS
+        run: |
+          cd backend/k8s/notification-service
+
+          kubectl apply -f notification-service-deployment.yaml
+          kubectl apply -f notification-service.yaml
+
+  deploy-reminder-service:
+    name: Deploy Reminder Service to EKS
+    runs-on: ubuntu-latest
+    needs: [create-eks-cluster, push-to-dockerhub-reminder-service, deploy-mongodb-reminder-service]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Set up AWS CLI
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: "us-east-1"
+
+      - name: Configure kubectl for EKS
+        run: |
+          aws eks --region us-east-1 update-kubeconfig --name eldycare-cluster
+
+      - name: Deploy Reminder Service to EKS
+        run: |
+          cd backend/k8s/reminder-service
+
+          kubectl apply -f reminder-service-deployment.yaml
+          kubectl apply -f reminder-service.yaml
 
   deploy-mongodb-notification-service:
     name: Deploy MongoDB Notification Service to EKS
@@ -285,7 +387,7 @@ jobs:
 
       - name: Deploy MongoDB Notification Service to EKS
         run: |
-          cd backend/mongodb-notification
+          cd backend/k8s/mongodb-notification
 
           kubectl apply -f mongodb-notification-deployment.yaml
           kubectl apply -f mongodb-notification-service.yaml
@@ -311,7 +413,7 @@ jobs:
 
       - name: Deploy Postgres Service to EKS
         run: |
-          cd backend/postgres
+          cd backend/k8s/postgres
 
           kubectl apply -f postgres-deployment.yaml
           kubectl apply -f postgres-service.yaml
@@ -337,7 +439,7 @@ jobs:
 
       - name: Deploy MongoDB Reminder Service to EKS
         run: |
-          cd backend/mongodb-reminder
+          cd backend/k8s/mongodb-reminder
 
           kubectl apply -f mongodb-reminder-deployment.yaml
           kubectl apply -f mongodb-reminder-service.yaml
@@ -363,7 +465,7 @@ jobs:
 
       - name: Deploy Neo4j Service to EKS
         run: |
-          cd backend/neo4j
+          cd backend/k8s/neo4j
 
           kubectl apply -f neo4j-deployment.yaml
           kubectl apply -f neo4j-service.yaml
@@ -389,7 +491,7 @@ jobs:
 
       - name: Deploy RabbitMQ Service to EKS
         run: |
-          cd backend/rabbitmq
+          cd backend/k8s/rabbitmq
 
           kubectl apply -f rabbitmq-deployment.yaml
           kubectl apply -f rabbitmq-service.yaml
