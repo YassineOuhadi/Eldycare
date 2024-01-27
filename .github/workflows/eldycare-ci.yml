@@ -45,6 +45,12 @@ jobs:
         with:
           name: authentication-service
           path: ./backend/authentication-service
+
+      - name: upload Artifacts for user-service
+        uses: actions/upload-artifact@v4.0.0
+        with:
+          name: user-service
+          path: ./backend/user-service
           
   push-to-dockerhub-discovery-service:
     name: push-to-dockerhub-discovery-service
@@ -101,6 +107,26 @@ jobs:
         uses: mr-smithers-excellent/docker-build-push@v6
         with:
           image: yassineouhadi/eldycare-authentication-service
+          tags: latest
+          registry: docker.io
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+  push-to-dockerhub-user-service:
+    name: push-to-dockerhub-user-service
+    runs-on: ubuntu-latest
+    needs: build-microservices
+    steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: user-service
+      - name: List contents of the folders
+        run: ls -R
+      - name: Build & push Docker image user-service
+        uses: mr-smithers-excellent/docker-build-push@v6
+        with:
+          image: yassineouhadi/eldycare-user-service
           tags: latest
           registry: docker.io
           username: ${{ secrets.DOCKER_USERNAME }}
@@ -209,6 +235,32 @@ jobs:
 
           kubectl apply -f authentication-service-deployment.yaml
           kubectl apply -f authentication-service.yaml
+
+  deploy-user-service:
+    name: Deploy User Service to EKS
+    runs-on: ubuntu-latest
+    needs: [create-eks-cluster, push-to-dockerhub-user-service, deploy-neo4j-service, deploy-rabbitmq-service]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Set up AWS CLI
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: "us-east-1"
+
+      - name: Configure kubectl for EKS
+        run: |
+          aws eks --region us-east-1 update-kubeconfig --name eldycare-cluster
+
+      - name: Deploy User Service to EKS
+        run: |
+          cd backend/user-service
+
+          kubectl apply -f user-service-deployment.yaml
+          kubectl apply -f user-service.yaml
   
   # ...
 

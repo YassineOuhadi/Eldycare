@@ -1,26 +1,24 @@
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: postgres-deployment
+  name: neo4j-service
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: postgres
+      app: neo4j-service
   template:
     metadata:
       labels:
-        app: postgres
+        app: neo4j-service
     spec:
       containers:
-        - name: postgres
-          image: postgres:latest
+        - name: neo4j-service
+          image: neo4j:latest
           ports:
-            - containerPort: 5432
+            - containerPort: 7474
+            - containerPort: 7687
           env:
-            - name: POSTGRES_DB
-              value: eldycare
-            - name: POSTGRES_USER
-              value: postgres
-            - name: POSTGRES_PASSWORD
-              value: postgres
+            - name: NEO4J_AUTH
+              value: neo4j/saga-pablo-lagoon-java-license-4169

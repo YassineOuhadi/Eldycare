@@ -1,26 +1,24 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: postgres-deployment
+  name: mongodb-notification-service
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: postgres
+      app: mongodb-notification-service
   template:
     metadata:
       labels:
-        app: postgres
+        app: mongodb-notification-service
     spec:
       containers:
-        - name: postgres
-          image: postgres:latest
+        - name: mongodb-notification-service
+          image: mongo:latest
           ports:
-            - containerPort: 5432
+            - containerPort: 27017
           env:
-            - name: POSTGRES_DB
-              value: eldycare
-            - name: POSTGRES_USER
-              value: postgres
-            - name: POSTGRES_PASSWORD
-              value: postgres
+            - name: MONGO_INITDB_ROOT_USERNAME
+              value: mongo
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              value: mongo
