@@ -28,7 +28,7 @@ public class ApiGatewayServiceApplication {
                 GatewayFilter filter = jwtValidationFilter.apply(new JwtValidationGatewayFilterFactory.Config());
                 return builder.routes()
                                 .route(r -> r.path("/auth/**")
-                                                .uri("lb://AUTHENTICATION-SERVICE"))
+                                                .uri("lb://authentication-service"))
 //                                .route(r -> r.path("/filter-test/**")
 //                                                .filters(f -> f.filter(filter))
 //                                                .uri("lb://AUTHENTICATION-SERVICE"))
