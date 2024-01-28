@@ -1,18 +1,6 @@
 server:
   port: 8888
 
-ribbon:
-  eureka:
-   enabled: false
-
-authentication-service:
-  ribbon:
-    listOfServers: http://authentication-service
-
-AUTHENTICATION-SERVICE:
-  ribbon:
-    listOfServers: http://authentication-service
-    
 eureka:
   client:
     register-with-eureka: true

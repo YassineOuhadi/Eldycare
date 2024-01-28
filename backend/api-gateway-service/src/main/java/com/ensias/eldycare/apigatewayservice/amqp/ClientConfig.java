@@ -1,10 +1,14 @@
 package com.ensias.eldycare.apigatewayservice.amqp;
 
+import com.netflix.appinfo.AmazonInfo;
 import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.support.converter.SimpleMessageConverter;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.commons.util.InetUtils;
+import org.springframework.cloud.netflix.eureka.EurekaInstanceConfigBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 import java.util.List;
 
@@ -16,6 +20,16 @@ import java.util.List;
 public class ClientConfig {
     @Value("${amqp.auth.exchange}")
     private String exchangeName;
+
+    @Bean
+    @Profile("!default")
+    public EurekaInstanceConfigBean eurekaInstanceConfig(InetUtils inetUtils) {
+        EurekaInstanceConfigBean b = new EurekaInstanceConfigBean(inetUtils);
+        AmazonInfo info = AmazonInfo.Builder.newBuilder().autoBuild("eureka");
+        b.setDataCenterInfo(info);
+        return b;
+    }
+
 
     @Bean
     public DirectExchange directExchange() {
