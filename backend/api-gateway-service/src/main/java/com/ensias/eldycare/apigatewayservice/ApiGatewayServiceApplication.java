@@ -27,18 +27,21 @@ public class ApiGatewayServiceApplication {
         public RouteLocator gatewayRoutes(RouteLocatorBuilder builder) {
                 GatewayFilter filter = jwtValidationFilter.apply(new JwtValidationGatewayFilterFactory.Config());
                 return builder.routes()
-                        .route(r -> r.path("/auth/**")
-                                .uri("lb://authentication-service"))  // Updated service name
-                        .route(r -> r.path("/users/**")
-                                .filters(f -> f.filter(filter))
-                                .uri("lb://user-service"))  // Updated service name
-                        .route(r -> r.path("/notification/**")
-                                .filters(f -> f.filter(filter))
-                                .uri("lb://notification-service"))  // Updated service name
-                        .route(r -> r.path("/reminder/**")
-                                .filters(f -> f.filter(filter))
-                                .uri("lb://reminder-service"))  // Updated service name
-                        .build();
+                                .route(r -> r.path("/auth/**")
+                                                .uri("lb://AUTHENTICATION-SERVICE"))
+//                                .route(r -> r.path("/filter-test/**")
+//                                                .filters(f -> f.filter(filter))
+//                                                .uri("lb://AUTHENTICATION-SERVICE"))
+                                .route(r -> r.path("/users/**")
+                                                .filters(f -> f.filter(filter))
+                                                .uri("lb://USER-SERVICE"))
+                                .route(r -> r.path("/notification/**")
+                                                .filters(f -> f.filter(filter))
+                                                .uri("lb://NOTIFICATION-SERVICE"))
+                                .route(r -> r.path("/reminder/**")
+                                        .filters(f -> f.filter(filter))
+                                        .uri("lb://REMINDER-SERVICE"))
+                                .build();
         }
 
 }
